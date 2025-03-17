@@ -8,21 +8,32 @@ export class NeteaseController {
   constructor(private readonly neteaseService: NeteaseService) {}
 
   @Get('song/:id')
-  async findSong(@Req() req: Request, @Param('id') id: string): Promise<Song> {
-    return this.neteaseService.findSong(req, id);
+  @Header('Content-Type', 'application/json; charset=utf-8')
+  async findSong(
+    @Req() request: Request,
+    @Param('id') id: string,
+  ): Promise<Song> {
+    return this.neteaseService.findSong(request, id);
   }
 
   @Get('url/:id')
   @Header('Content-Type', 'audio/mpeg')
-  async findFile(@Param('id') id: string): Promise<Blob> {
-    return this.neteaseService.findFile(id);
+  async findUrl(@Param('id') id: string): Promise<Blob> {
+    return this.neteaseService.findUrl(id);
+  }
+
+  @Get('lrc/:id')
+  @Header('Content-Type', 'text/plain; charset=utf-8')
+  async findLrc(@Param('id') id: string): Promise<string> {
+    return this.neteaseService.findLrc(id);
   }
 
   @Get('playlist/:id')
+  @Header('Content-Type', 'application/json; charset=utf-8')
   async findPlaylist(
-    @Req() req: Request,
+    @Req() request: Request,
     @Param('id') id: string,
   ): Promise<Song[]> {
-    return this.neteaseService.findPlaylist(req, id);
+    return this.neteaseService.findPlaylist(request, id);
   }
 }
