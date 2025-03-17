@@ -12,7 +12,7 @@ import {
 export class NeteaseService {
   constructor() {}
 
-  async findSong(request: Request, id: string): Promise<Song> {
+  async findSong(this: void, request: Request, id: string): Promise<Song> {
     return fetch('http://music.163.com/api/v3/song/detail/', {
       method: 'POST',
       headers: {
