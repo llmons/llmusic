@@ -1,7 +1,7 @@
 export interface Song {
   title: string;
-  artist: string;
+  author: string;
   pic: string;
-  file: string;
+  url: string;
   lrc: string;
 }

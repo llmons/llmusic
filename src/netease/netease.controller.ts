@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req } from '@nestjs/common';
+import { Controller, Get, Header, Param, Req } from '@nestjs/common';
 import { NeteaseService } from './netease.service';
 import { Song } from 'src/interfaces/common.interface';
 import { Request } from 'express';
@@ -8,12 +8,21 @@ export class NeteaseController {
   constructor(private readonly neteaseService: NeteaseService) {}
 
   @Get('song/:id')
-  async indSong(@Req() req: Request, @Param('id') id: string): Promise<Song> {
+  async findSong(@Req() req: Request, @Param('id') id: string): Promise<Song> {
     return this.neteaseService.findSong(req, id);
   }
 
-  @Get('file/:id')
-  async getFile(@Param('id') id: string): Promise<Blob> {
+  @Get('url/:id')
+  @Header('Content-Type', 'audio/mpeg')
+  async findFile(@Param('id') id: string): Promise<Blob> {
     return this.neteaseService.findFile(id);
+  }
+
+  @Get('playlist/:id')
+  async findPlaylist(
+    @Req() req: Request,
+    @Param('id') id: string,
+  ): Promise<Song[]> {
+    return this.neteaseService.findPlaylist(req, id);
   }
 }
