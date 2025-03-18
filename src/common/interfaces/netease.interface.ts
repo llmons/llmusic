@@ -31,18 +31,9 @@ export interface NeteaseLyric {
 
 export interface NeteasePlaylist {
   playlist: {
-    tracks: [
+    trackIds: [
       {
-        name: string;
         id: number;
-        ar: [
-          {
-            name: string;
-          },
-        ];
-        al: {
-          picUrl: string;
-        };
       },
     ];
   };

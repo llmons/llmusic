@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { TencentPlaylist, TencentSong } from 'src/interfaces/tencent.interface';
-import { Song } from 'src/interfaces/common.interface';
+import { HttpException, Injectable } from '@nestjs/common';
+import {
+  TencentPlaylist,
+  TencentSong,
+} from 'src/common/interfaces/tencent.interface';
+import { Song } from 'src/common/interfaces/common.interface';
 import { Request } from 'express';
 
 @Injectable()
@@ -14,24 +17,23 @@ export class TencentService {
       format: 'json',
     });
 
-    return fetch(
-      `https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg?${params.toString()}`,
-    )
-      .then((response) => response.json())
-      .then((json: TencentSong) => {
-        const song = json.data[0];
-        return {
-          title: song.name,
-          author: song.singer[0].name,
-          pic: '',
-          url: `${request.protocol}://${request.get('host')}/tencent/url/${mid}`,
-          lrc: `${request.protocol}://${request.get('host')}/tencent/lrc/${mid}`,
-        };
-      })
-      .catch((error) => {
-        console.error(error);
-        throw new Error('Failed to fetch song');
-      });
+    try {
+      const response = await fetch(
+        `https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg?${params.toString()}`,
+      );
+      const json = (await response.json()) as TencentSong;
+      const song = json.data[0];
+      return {
+        title: song.name,
+        author: song.singer[0].name,
+        pic: '',
+        url: `${request.protocol}://${request.get('host')}/api/tencent/url/${mid}`,
+        lrc: `${request.protocol}://${request.get('host')}/api/tencent/lrc/${mid}`,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('Internal server error', 500);
+    }
   }
 
   async findUrl(mid: string) {
@@ -41,19 +43,18 @@ export class TencentService {
       format: 'json',
     });
 
-    return fetch(
-      `https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg?${params.toString()}`,
-    )
-      .then((response) => response.json())
-      .then((json: TencentSong) => {
-        const song = json.data[0];
-        console.log(song);
-        return new Blob();
-      })
-      .catch((error) => {
-        console.error(error);
-        throw new Error('Failed to fetch song');
-      });
+    try {
+      const response = await fetch(
+        `https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg?${params.toString()}`,
+      );
+      const json = (await response.json()) as TencentSong;
+      const song = json.data[0];
+      console.log(song);
+      return new Blob();
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('Internal server error', 500);
+    }
   }
 
   async findLrc(mid: string) {
@@ -63,19 +64,18 @@ export class TencentService {
       format: 'json',
     });
 
-    return fetch(
-      `https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg?${params.toString()}`,
-    )
-      .then((response) => response.json())
-      .then((json: TencentSong) => {
-        const song = json.data[0];
-        console.log(song);
-        return '';
-      })
-      .catch((error) => {
-        console.error(error);
-        throw new Error('Failed to fetch song');
-      });
+    try {
+      const response = await fetch(
+        `https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg?${params.toString()}`,
+      );
+      const json = (await response.json()) as TencentSong;
+      const song = json.data[0];
+      console.log(song);
+      return '';
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('Internal server error', 500);
+    }
   }
 
   async findPlaylist(request: Request, id: string) {
@@ -85,24 +85,24 @@ export class TencentService {
       newsong: '1',
       platform: 'yqq',
     });
-    return fetch(
-      `https://c.y.qq.com/v8/fcg-bin/fcg_v8_playlist_cp.fcg?${params.toString()}`,
-    )
-      .then((response) => response.json())
-      .then((json: TencentPlaylist) => {
-        return json.data.cdlist[0].songlist.map((song) => {
-          return {
-            title: song.name,
-            author: song.singer[0].name,
-            pic: '',
-            url: `${request.protocol}://${request.get('host')}/tencent/url/${song.mid}`,
-            lrc: `${request.protocol}://${request.get('host')}/tencent/lrc/${song.mid}`,
-          };
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-        throw new Error('Failed to fetch playlist');
+
+    try {
+      const response = await fetch(
+        `https://c.y.qq.com/v8/fcg-bin/fcg_v8_playlist_cp.fcg?${params.toString()}`,
+      );
+      const json = (await response.json()) as TencentPlaylist;
+      return json.data.cdlist[0].songlist.map((song) => {
+        return {
+          title: song.name,
+          author: song.singer[0].name,
+          pic: '',
+          url: `${request.protocol}://${request.get('host')}/api/tencent/url/${song.mid}`,
+          lrc: `${request.protocol}://${request.get('host')}/api/tencent/lrc/${song.mid}`,
+        };
       });
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('Internal server error', 500);
+    }
   }
 }

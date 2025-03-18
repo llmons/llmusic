@@ -1,9 +1,18 @@
-import { Controller, Get, Req, Param, Header } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Req,
+  Param,
+  Header,
+  UseInterceptors,
+} from '@nestjs/common';
 import { TencentService } from './tencent.service';
-import { Song } from 'src/interfaces/common.interface';
+import { Song } from 'src/common/interfaces/common.interface';
 import { Request } from 'express';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 
-@Controller('tencent')
+@Controller('api/tencent')
+@UseInterceptors(ResponseInterceptor)
 export class TencentController {
   constructor(private readonly tencentService: TencentService) {}
 

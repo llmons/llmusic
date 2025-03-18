@@ -4,6 +4,6 @@ import { TencentService } from './tencent.service';
 
 @Module({
   controllers: [TencentController],
-  providers: [TencentService]
+  providers: [TencentService],
 })
 export class TencentModule {}

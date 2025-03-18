@@ -1,9 +1,19 @@
-import { Controller, Get, Header, Param, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  Param,
+  Req,
+  StreamableFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { NeteaseService } from './netease.service';
-import { Song } from 'src/interfaces/common.interface';
+import { Song } from 'src/common/interfaces/common.interface';
 import { Request } from 'express';
+import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
 
-@Controller('netease')
+@Controller('api/netease')
+@UseInterceptors(ResponseInterceptor)
 export class NeteaseController {
   constructor(private readonly neteaseService: NeteaseService) {}
 
@@ -18,12 +28,12 @@ export class NeteaseController {
 
   @Get('url/:id')
   @Header('Content-Type', 'audio/mpeg')
-  async findUrl(@Param('id') id: string): Promise<Blob> {
+  async findUrl(@Param('id') id: string): Promise<StreamableFile> {
     return this.neteaseService.findUrl(id);
   }
 
   @Get('lrc/:id')
-  @Header('Content-Type', 'text/plain; charset=utf-8')
+  @Header('Content-Type', 'text/json; charset=utf-8')
   async findLrc(@Param('id') id: string): Promise<string> {
     return this.neteaseService.findLrc(id);
   }
