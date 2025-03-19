@@ -5,6 +5,7 @@ import {
   Param,
   Header,
   UseInterceptors,
+  StreamableFile,
 } from '@nestjs/common';
 import { TencentService } from './tencent.service';
 import { Song } from 'src/common/interfaces/common.interface';
@@ -27,7 +28,7 @@ export class TencentController {
 
   @Get('url/:mid')
   @Header('Content-Type', 'audio/mp4')
-  async findUrl(@Param('mid') mid: string): Promise<Blob> {
+  async findUrl(@Param('mid') mid: string): Promise<StreamableFile> {
     return this.tencentService.findUrl(mid);
   }
 

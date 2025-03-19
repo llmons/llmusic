@@ -2,6 +2,7 @@ export interface TencentSong {
   data: [
     {
       album: {
+        id: number;
         name: string;
       };
       name: string;
