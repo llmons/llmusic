@@ -33,7 +33,7 @@ export class NeteaseController {
   }
 
   @Get('lrc/:id')
-  @Header('Content-Type', 'text/json; charset=utf-8')
+  @Header('Content-Type', 'application/json; charset=utf-8')
   async findLrc(@Param('id') id: string): Promise<string> {
     return this.neteaseService.findLrc(id);
   }

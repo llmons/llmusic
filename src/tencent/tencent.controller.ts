@@ -18,7 +18,7 @@ export class TencentController {
   constructor(private readonly tencentService: TencentService) {}
 
   @Get('song/:mid')
-  @Header('Content-Type', 'application/json;charset=utf-8')
+  @Header('Content-Type', 'application/json; charset=utf-8')
   async findSong(
     @Req() request: Request,
     @Param('mid') mid: string,
@@ -33,13 +33,13 @@ export class TencentController {
   }
 
   @Get('lrc/:mid')
-  @Header('Content-Type', 'text/plain;charset=utf-8')
+  @Header('Content-Type', 'application/json; charset=utf-8')
   async findLrc(@Param('mid') mid: string): Promise<string> {
     return this.tencentService.findLrc(mid);
   }
 
   @Get('playlist/:id')
-  @Header('Content-Type', 'application/json;charset=utf-8')
+  @Header('Content-Type', 'application/json; charset=utf-8')
   async findPlaylist(
     @Req() request: Request,
     @Param('id') id: string,

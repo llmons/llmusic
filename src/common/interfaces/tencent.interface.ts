@@ -2,7 +2,7 @@ export interface TencentSong {
   data: [
     {
       album: {
-        id: number;
+        mid: string;
         name: string;
       };
       name: string;
@@ -14,6 +14,23 @@ export interface TencentSong {
       mid: string;
     },
   ];
+}
+
+export interface TencentUrl {
+  req_0: {
+    data: {
+      sip: [string];
+      midurlinfo: [
+        {
+          purl: string;
+        },
+      ];
+    };
+  };
+}
+
+export interface TencentLrc {
+  lyric: string;
 }
 
 export interface TencentPlaylist {

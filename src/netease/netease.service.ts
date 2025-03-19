@@ -60,12 +60,16 @@ export class NeteaseService {
       if (!url) {
         throw new HttpException('Failed to fetch url', 404);
       }
+
+      // fetch binary file
       const fileResponse = await fetch(url);
       if (!fileResponse.body) {
         throw new Error('fileResponse.body is undefined');
       }
-      const nodeStream = Readable.from(fileResponse.body);
-      return new StreamableFile(nodeStream);
+
+      // transform to stream
+      const stream = Readable.from(fileResponse.body);
+      return new StreamableFile(stream);
     } catch (error) {
       console.error(error);
 

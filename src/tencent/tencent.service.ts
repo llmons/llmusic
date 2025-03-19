@@ -1,7 +1,9 @@
 import { HttpException, Injectable, StreamableFile } from '@nestjs/common';
 import {
+  TencentLrc,
   TencentPlaylist,
   TencentSong,
+  TencentUrl,
 } from 'src/common/interfaces/tencent.interface';
 import { Song } from 'src/common/interfaces/common.interface';
 import { Request } from 'express';
@@ -24,11 +26,10 @@ export class TencentService {
       );
       const json = (await response.json()) as TencentSong;
       const song = json.data[0];
-
       return {
         title: song.name,
         author: song.singer[0].name,
-        pic: `http://imgcache.qq.com/music/photo/album_300/${song.album.id % 100}/300_albumpic_${song.album.id}_0.jpg`,
+        pic: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${song.album.mid}.jpg`,
         url: `${request.protocol}://${request.get('host')}/api/tencent/url/${mid}`,
         lrc: `${request.protocol}://${request.get('host')}/api/tencent/lrc/${mid}`,
       };
@@ -39,22 +40,65 @@ export class TencentService {
   }
 
   async findUrl(mid: string): Promise<StreamableFile> {
+    const requestData = {
+      req_0: {
+        module: 'vkey.GetVkeyServer',
+        method: 'CgiGetVkey',
+        param: {
+          guid: (Math.random() * 10000000).toFixed(0),
+          songmid: [mid],
+          songtype: [0],
+          uin: '',
+          loginflag: 1,
+          platform: '20',
+        },
+      },
+      comm: {
+        uin: '',
+        format: 'json',
+        ct: 19,
+        cv: 0,
+        authst: '',
+      },
+    };
+
     const params = new URLSearchParams({
-      guid: '2802133086',
-      vkey: '7180D074FCB8D51AB01BD76E946EC0D1FAC3C6C4EF086834233FF71DB6A7A4773CA2B48F8CE8EE3BF944D03404C892EEEC61D820CFD4B41F__v2b9ab599',
-      uin: '1029154073',
-      fromtag: '120032',
-      src: 'C400001BGoaN18eAZ6.m4a',
+      '-': 'getplaysongvkey',
+      g_tk: '5381',
+      loginUin: '',
+      hostUin: '0',
+      format: 'json',
+      inCharset: 'utf8',
+      outCharset: 'utf-8¬ice=0',
+      platform: 'yqq.json',
+      needNewCode: '0',
+      data: JSON.stringify(requestData),
     });
 
     try {
-      const response = await fetch(
-        `https://ws6.stream.qqmusic.qq.com/C400${mid}.m4a?${params.toString()}`,
+      const urlResponse = await fetch(
+        `https://u.y.qq.com/cgi-bin/musicu.fcg?${params.toString()}`,
       );
-      if (!response.body) {
+      const json = (await urlResponse.json()) as TencentUrl;
+
+      // get purl and domain to combine to gain url
+      let purl = '';
+      if (json.req_0 && json.req_0.data && json.req_0.data.midurlinfo) {
+        purl = json.req_0.data.midurlinfo[0].purl;
+      }
+      if (!purl) {
+        throw new HttpException('Failed to fetch purl', 404);
+      }
+      const domain = json.req_0.data.sip[0];
+
+      // fetch combined url to get binary file
+      const fileResponse = await fetch(`${domain}${purl}`);
+      if (!fileResponse.body) {
         throw new HttpException('response body is empty', 500);
       }
-      const stream = Readable.from(response.body);
+
+      // transform to stream
+      const stream = Readable.from(fileResponse.body);
       return new StreamableFile(stream);
     } catch (error) {
       console.error(error);
@@ -65,18 +109,29 @@ export class TencentService {
   async findLrc(mid: string) {
     const params = new URLSearchParams({
       songmid: mid,
+      pcachetime: Date.now().toString(),
+      g_tk: '5381',
+      loginUin: '0',
+      hostUin: '0',
+      inCharset: 'utf8',
+      outCharset: 'utf-8',
+      notice: '0',
       platform: 'yqq',
+      needNewCode: '0',
       format: 'json',
     });
 
     try {
       const response = await fetch(
         `https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg?${params.toString()}`,
+        {
+          headers: {
+            Referer: 'https://y.qq.com',
+          },
+        },
       );
-      const json = (await response.json()) as TencentSong;
-      const song = json.data[0];
-      console.log(song);
-      return '';
+      const json = (await response.json()) as TencentLrc;
+      return Buffer.from(json.lyric, 'base64').toString();
     } catch (error) {
       console.error(error);
       throw new HttpException('Internal server error', 500);
@@ -101,7 +156,7 @@ export class TencentService {
         return {
           title: song.name,
           author: song.singer[0].name,
-          pic: `http://imgcache.qq.com/music/photo/album_300/${song.album.id % 100}/300_albumpic_${song.album.id}_0.jpg`,
+          pic: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${song.album.mid}.jpg`,
           url: `${request.protocol}://${request.get('host')}/api/tencent/url/${song.mid}`,
           lrc: `${request.protocol}://${request.get('host')}/api/tencent/lrc/${song.mid}`,
         };
