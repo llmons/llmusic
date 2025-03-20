@@ -1,16 +1,16 @@
 import {
   Controller,
   Get,
-  Req,
-  Param,
   Header,
-  UseInterceptors,
+  Param,
+  Req,
   StreamableFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { TencentService } from './tencent.service';
-import { Song } from 'src/common/interfaces/common.interface';
 import { Request } from 'express';
 import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { Song } from 'src/common/interfaces/common.interface';
+import { TencentService } from './tencent.service';
 
 @Controller('api/tencent')
 @UseInterceptors(ResponseInterceptor)

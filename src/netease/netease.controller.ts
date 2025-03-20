@@ -7,10 +7,10 @@ import {
   StreamableFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { NeteaseService } from './netease.service';
-import { Song } from 'src/common/interfaces/common.interface';
 import { Request } from 'express';
 import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { Song } from 'src/common/interfaces/common.interface';
+import { NeteaseService } from './netease.service';
 
 @Controller('api/netease')
 @UseInterceptors(ResponseInterceptor)

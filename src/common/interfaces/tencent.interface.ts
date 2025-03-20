@@ -1,3 +1,17 @@
+export interface TencentLrc {
+  lyric: string;
+}
+
+export interface TencentPlaylist {
+  data: {
+    cdlist: [
+      {
+        songlist: TencentSong['data'];
+      },
+    ];
+  };
+}
+
 export interface TencentSong {
   data: [
     {
@@ -26,19 +40,5 @@ export interface TencentUrl {
         },
       ];
     };
-  };
-}
-
-export interface TencentLrc {
-  lyric: string;
-}
-
-export interface TencentPlaylist {
-  data: {
-    cdlist: [
-      {
-        songlist: TencentSong['data'];
-      },
-    ];
   };
 }

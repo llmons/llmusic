@@ -1,12 +1,17 @@
-import { HttpException, Injectable, StreamableFile } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  Logger,
+  StreamableFile,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { Song } from 'src/common/interfaces/common.interface';
 import {
   TencentLrc,
   TencentPlaylist,
   TencentSong,
   TencentUrl,
 } from 'src/common/interfaces/tencent.interface';
-import { Song } from 'src/common/interfaces/common.interface';
-import { Request } from 'express';
 import { Readable } from 'stream';
 
 @Injectable()
@@ -34,7 +39,7 @@ export class TencentService {
         lrc: `${request.protocol}://${request.get('host')}/api/tencent/lrc/${mid}`,
       };
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
       throw new HttpException('Internal server error', 500);
     }
   }
@@ -101,7 +106,7 @@ export class TencentService {
       const stream = Readable.from(fileResponse.body);
       return new StreamableFile(stream);
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
       throw new HttpException('Internal server error', 500);
     }
   }
@@ -133,7 +138,7 @@ export class TencentService {
       const json = (await response.json()) as TencentLrc;
       return Buffer.from(json.lyric, 'base64').toString();
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
       throw new HttpException('Internal server error', 500);
     }
   }
@@ -162,7 +167,7 @@ export class TencentService {
         };
       });
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
       throw new HttpException('Internal server error', 500);
     }
   }

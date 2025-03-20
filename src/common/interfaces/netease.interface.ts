@@ -1,3 +1,19 @@
+export interface NeteaseLyric {
+  lrc: {
+    lyric: string;
+  };
+}
+
+export interface NeteasePlaylist {
+  playlist: {
+    trackIds: [
+      {
+        id: number;
+      },
+    ];
+  };
+}
+
 export interface NeteaseSong {
   songs: [
     {
@@ -21,20 +37,4 @@ export interface NeteaseUrl {
       url: string;
     },
   ];
-}
-
-export interface NeteaseLyric {
-  lrc: {
-    lyric: string;
-  };
-}
-
-export interface NeteasePlaylist {
-  playlist: {
-    trackIds: [
-      {
-        id: number;
-      },
-    ];
-  };
 }

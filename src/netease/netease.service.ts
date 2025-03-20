@@ -1,11 +1,16 @@
-import { HttpException, Injectable, StreamableFile } from '@nestjs/common';
-import { Song } from 'src/common/interfaces/common.interface';
-import { Request } from 'express';
 import {
-  NeteaseSong,
-  NeteaseUrl,
+  HttpException,
+  Injectable,
+  Logger,
+  StreamableFile,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { Song } from 'src/common/interfaces/common.interface';
+import {
   NeteaseLyric,
   NeteasePlaylist,
+  NeteaseSong,
+  NeteaseUrl,
 } from 'src/common/interfaces/netease.interface';
 import { Readable } from 'stream';
 
@@ -25,7 +30,9 @@ export class NeteaseService {
         }),
       });
       const json = (await response.json()) as NeteaseSong;
-
+      if (!json.songs.length) {
+        throw new HttpException('Song not found', 404);
+      }
       const song = json.songs[0];
       return {
         title: song.name,
@@ -35,12 +42,16 @@ export class NeteaseService {
         lrc: `${request.protocol}://${request.get('host')}/api/netease/lrc/${id}`,
       };
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       throw new HttpException('Internal server error', 500);
     }
   }
 
-  async findUrl(id: string): Promise<StreamableFile> {
+  async findUrl(this: void, id: string): Promise<StreamableFile> {
     try {
       const urlResponse = await fetch(
         'http://music.163.com/api/song/enhance/player/url',
@@ -71,8 +82,7 @@ export class NeteaseService {
       const stream = Readable.from(fileResponse.body);
       return new StreamableFile(stream);
     } catch (error) {
-      console.error(error);
-
+      Logger.error(error);
       if (error instanceof HttpException) {
         throw error;
       }
@@ -81,7 +91,7 @@ export class NeteaseService {
     }
   }
 
-  async findLrc(id: string): Promise<string> {
+  async findLrc(this: void, id: string): Promise<string> {
     try {
       const response = await fetch('http://music.163.com/api/song/lyric', {
         method: 'POST',
@@ -99,7 +109,7 @@ export class NeteaseService {
       const json = (await response.json()) as NeteaseLyric;
       return json.lrc.lyric;
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
       throw new HttpException('Internal server error', 500);
     }
   }
@@ -130,7 +140,7 @@ export class NeteaseService {
       );
       return songs;
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
       throw new HttpException('Internal server error', 500);
     }
   }
