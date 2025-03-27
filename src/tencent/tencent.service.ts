@@ -18,7 +18,7 @@ import { Readable } from 'stream';
 export class TencentService {
   constructor() {}
 
-  async findSong(request: Request, mid: string): Promise<Song> {
+  async findSong(this: void, request: Request, mid: string): Promise<Song> {
     const params = new URLSearchParams({
       songmid: mid,
       platform: 'yqq',
@@ -44,7 +44,7 @@ export class TencentService {
     }
   }
 
-  async findUrl(mid: string): Promise<StreamableFile> {
+  async findUrl(this: void, mid: string): Promise<StreamableFile> {
     const requestData = {
       req_0: {
         module: 'vkey.GetVkeyServer',
@@ -111,7 +111,7 @@ export class TencentService {
     }
   }
 
-  async findLrc(mid: string) {
+  async findLrc(this: void, mid: string) {
     const params = new URLSearchParams({
       songmid: mid,
       pcachetime: Date.now().toString(),

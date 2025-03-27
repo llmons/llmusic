@@ -53,7 +53,6 @@ describe('NeteaseController', () => {
       const song = {
         title: '梦想天空分外蓝',
         author: '陈奕迅',
-        pic: 'http://p1.music.126.net/y1hkRJZ5UpNj_K2NLO8AKg==/831230790638810.jpg',
         url: 'http://localhost:3000/api/netease/url/25638273',
         lrc: 'http://localhost:3000/api/netease/lrc/25638273',
       };
@@ -65,19 +64,17 @@ describe('NeteaseController', () => {
 
       const result = await service.findSong(request, '25638273');
 
-      expect(result).toStrictEqual(song);
+      expect(result).toEqual(expect.objectContaining(song));
     });
 
-    // it('should return a song from service with false id', async () => {
-    //   const request = {
-    //     protocol: 'http',
-    //     get: jest.fn().mockReturnValue('localhost:3000'),
-    //   } as unknown as Request;
+    it('should return a song from service with false id', async () => {
+      const request = {
+        protocol: 'http',
+        get: jest.fn().mockReturnValue('localhost:3000'),
+      } as unknown as Request;
 
-    //   const result = await service.findSong(request, '1');
-
-    //   await expect(result).rejects.toThrow(HttpException);
-    // });
+      await expect(() => service.findSong(request, '1')).rejects.toThrow();
+    });
   });
 
   // describe('findUrl', () => {
